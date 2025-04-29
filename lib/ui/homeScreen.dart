@@ -49,11 +49,17 @@ class _HomescreenState extends State<Homescreen>
       decoration: BoxDecoration(
         image: DecorationImage(image: AssetImage(bgImage), fit: BoxFit.cover),
       ),
+      
       child: Obx(() {
+        
+        final filteredDataList = homeController.getGasStationRespModel
+          ?.where((item) => item.type == mapTitleToType(selectedTitle.value))
+          .toList() ?? [];
+        log("filteredDataList **** ${filteredDataList.length}");
         return Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            backgroundColor: Colors.transparent,
+            backgroundColor: Colors.black,
             leading: Padding(
               padding: const EdgeInsets.only(left: 10.0),
               child: Image.asset(kIconLogo),
@@ -107,7 +113,7 @@ class _HomescreenState extends State<Homescreen>
                   ),
                 ),
               ),
-
+          
               // Actual content pushed below
               Column(
                 children: [
@@ -115,7 +121,7 @@ class _HomescreenState extends State<Homescreen>
                     width: double.infinity,
                     alignment: Alignment.center,
                     padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    margin: EdgeInsets.symmetric(horizontal: 16,vertical: 10),
                     color: Colors.grey[300],
                     child: Text("Last sync on : ${homeController.syncDate}"),
                   ),
@@ -157,7 +163,7 @@ class _HomescreenState extends State<Homescreen>
                 width: double.infinity,
                 alignment: Alignment.center,
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                 color: Colors.grey[300],
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -172,12 +178,11 @@ class _HomescreenState extends State<Homescreen>
                 ),
               ),
               Expanded(
-                child: GasTableData(
-                  // gasTableData: homeController.getGasDataRespModel ?? [],
-                  // gasTableData: homeController.getGasDataRespModel?.map((e) => e.toJson()).toList() ?? [],
-                gasTableData: homeController.getGasStationRespModel?.map((e) => e.toJson()).toList() ?? [],
+                child: GasTableData( 
+                // gasTableData: homeController.getGasStationRespModel?.map((e) => e.toJson()).toList() ?? [],
+                gasTableData: filteredDataList.map((e) => e.toJson()).toList(),
                 type: mapTitleToType(selectedTitle.value), 
-     
+               
                 )
               ),
             ],
