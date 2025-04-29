@@ -15,23 +15,30 @@ dependencies:
     sdk: flutter
   
   secure_shared_preferences: ^0.0.4
-  get: ^4.6.5
-  http: ^1.1.0
+  get: ^4.6.5 
   google_fonts: 6.1.0
   flutter_otp_text_field: ^1.1.1
   package_info_plus: ^4.1.0
   geolocator: ^9.0.2
   geocoding: ^2.0.5
   syncfusion_flutter_charts: ^23.1.41
+  
 
 
   cupertino_icons: ^1.0.8
+  flutter_launcher_icons: ^0.14.3
+  connectivity_plus: ^6.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/gail_logo.png"
 
 
 flutter:

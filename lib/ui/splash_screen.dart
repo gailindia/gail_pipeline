@@ -1,9 +1,12 @@
 
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:gail_pipeline/constants/app_constants.dart';
+import 'package:gail_pipeline/ui/login_screen.dart';
 import 'package:gail_pipeline/widgets/logowidget.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,26 +30,29 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // getAppVersion();
+  
+      Timer(
+        const Duration(seconds: 5),
+            () =>
+                Get.toNamed('/homeScreen')
+                // Get.toNamed('/loginScreen')
 
-    _navigateToNextScreen();
+    );
+
+   
+
+    // _navigateToNextScreen();
   }
 
   @override
-  Widget build(BuildContext context) { 
-    final _height = MediaQuery.of(context).size.height; 
-    final _width = MediaQuery.of(context).size.width;
-    return Scaffold(
-      body: Container(
-        height: _height,
-        width: _width,
-        // decoration: const BoxDecoration(
-        //   image: DecorationImage(
-        //     image: AssetImage("assets/images/gail_logo.png"),
-        //     fit: BoxFit.fill,
-        //   ),
-        // ),
-        child: Center(
+  Widget build(BuildContext context) {  
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(image: AssetImage(bgImage),fit: BoxFit.cover)
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -61,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       style: GoogleFonts.hind(
                         textStyle: Theme.of(context).textTheme.headlineMedium,
                         fontSize: 25,
-                        color: Colors.black87,
+                        color: Colors.white,
                         fontWeight: FontWeight.w700,
                         fontStyle: FontStyle.normal,
                       ),
@@ -74,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       style: GoogleFonts.hind(
                         textStyle: Theme.of(context).textTheme.headlineMedium,
                         fontSize: 25,
-                        color: Colors.black87,
+                        color: Colors.white,
                         fontWeight: FontWeight.w700,
                         fontStyle: FontStyle.normal,
                       ),
