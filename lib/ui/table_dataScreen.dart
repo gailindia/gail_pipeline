@@ -1,57 +1,21 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:gail_pipeline/ui/mapType.dart';
 import 'package:gail_pipeline/widgets/styles/mytextStyle.dart';
 
-// // Beautify function
-// String beautifyHeader(String text) {
-//   return text.replaceAll('_', ' ').split(' ').map((word) =>
-//       word.isNotEmpty ? word[0].toUpperCase() + word.substring(1).toLowerCase() : ''
-//   ).join(' ');
-// }
 
-//////////////////////////// header data //////////////////////////////////////
-final headersMap = {
-  "COMP": ['Name', 'SP\n(Kg/cm2)', 'DP\n(Kg/cm2)', 'FR\n(KSCMH)'],
-  "INJT": ['Name', 'Pressure\n(Kg/cm2)', 'Flow\n(KSCMH)'],
-  "GPU": [
-    'GAS\nPLANT',
-    'PR\n(Kg/cm2)',
-    'VOL\n(KSCMH)',
-    'C2/C4\n(%)',
-    'LOAD\n(%)',
-  ],
-  "EPP": ['Name', 'Region', 'Pressure\n(Kg/cm2)', 'Flow\n(KSCMH)'],
-  "CSCP": ['Name', 'Pressure\n(Kg/cm2)', 'Flow\n(KSCMH)'],
-  "GASQ": ['Plant', 'C2\n(%)', 'C3\n(%)', 'C4\n(%)'],
-  "LPK": ['Name', 'Region', 'Vol\n(MMSCM)'],
-  "RMXN": ['Name', 'Region', 'FLow\n(KSCMH)'],
-};
-/////////////////////////// row data /////////////////////////////////////
-final rowMap = {
-  "COMP": ['name', 'Inlet', 'Discharg', 'Flow'],
-  "INJT": ['name', 'Inlet', 'Flow'],
-  "GPU": [
-    'name',
-    'FedGas_PR',
-    'FedGas_Volume',
-    'FedGas_C_Four',
-    'Plant_Load_Percentage',
-  ],
-  "EPP": ['name', 'Parameter_Code', 'FedGas_Volume', 'FedGas_PR'],
-  "CSCP": ['name', 'Inlet', 'Flow'],
-  "GASQ": ['name', 'FedGas_PR', 'FedGas_Volume', 'FedGas_C_Four'],
-  "LPK": ['name', 'Parameter_Code', 'FedGas_PR'],
-  "RMXN": ['name', 'Parameter_Code', 'FedGas_PR'],
-};
 
 class GasTableData extends StatefulWidget {
   final List<Map<String, dynamic>> gasTableData;
+  final List <Map<String,dynamic>> getGasData;
   final String type;
+  final void Function(Map<String, dynamic>)? onRowSelected;
 
   const GasTableData({
     required this.gasTableData,
-    required this.type,
+    required this.getGasData,
+    required this.type,this.onRowSelected,
     super.key,
   });
 
@@ -63,19 +27,14 @@ class _GasTableDataState extends State<GasTableData> {
   int _sortColumnIndex = 0;
   bool _sortAscending = true;
 
-  @override
-  void initState() {
-    super.initState();
-  }
+   
 
   @override
   Widget build(BuildContext context) {
-    if (widget.gasTableData.isEmpty) {
-      return const Center(child: Text("No Data Available"));
-    }
-
+ 
     final gasDataSource = _GasDataSource(
       widget.gasTableData,
+      widget.getGasData,
       widget.type,
       context,
     );
@@ -87,49 +46,105 @@ class _GasTableDataState extends State<GasTableData> {
     }
     final isPaginated = widget.gasTableData.length > 5;
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child:ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: double.infinity),
-        child: DataTableTheme(
-           data: DataTableThemeData(
-    headingRowColor: WidgetStateProperty.all(Colors.blueAccent),
-    dataRowColor: WidgetStateProperty.all(Colors.black),
-    dividerThickness: 1,
-  ),
-          child: isPaginated
-          ? PaginatedDataTable( 
-            rowsPerPage: 10,
-            columnSpacing: 20, 
-            showCheckboxColumn: false,
-            sortColumnIndex: _sortColumnIndex,
-            sortAscending: _sortAscending,
-            columns: gasDataSource.getColumns((columnIndex, ascending) {
-              setState(() {
-                _sortColumnIndex = columnIndex;
-                _sortAscending = ascending;
-                gasDataSource.sort(columnIndex, ascending);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final fieldKeys = rowMap[widget.type];
+        final filteredRows =
+            widget.gasTableData.where((item) {
+              if (fieldKeys == null) return false;
+              return fieldKeys.every((key) {
+                final value = item[key];
+                return value != null && value.toString().trim().isNotEmpty;
               });
-            }),
-            source: gasDataSource,
-          )
-          : DataTable(
-            showCheckboxColumn: false,
-              columns: columns,
-              rows: List.generate(widget.gasTableData.length, (index) {
-                final item = widget.gasTableData[index];
-                return DataRow(
-                  cells: gasDataSource.getRowCells(item),
-                  onSelectChanged: (selected) {
-                    if (selected ?? false) {
-                      print('Row clicked: ${item['name']}');
-                    }
-                  },
-                );
-              }),
+            }).toList();
+        final filteredGasTable = widget.getGasData.where((element) {
+            final type = element['TYPE']?.toString().trim();
+            return type == widget.type.toString().trim();
+          }).toList();
+          
+
+        //     ////////for checking value ////////
+        // for (var item in widget.gasTableData) {
+        //   log('Checking item: ${item['name']}');
+        //   for (var key in fieldKeys ?? []) {
+        //     final val = item[key];
+        //     log('  Key: $key → ${val.runtimeType}: $val');
+        //   }
+        // }
+        log("filteredRows ())))) ${filteredRows.length} ()() ${widget.type}");
+        log("filteredRows ()))))&&&&&& ${filteredGasTable.length} ()() $filteredGasTable");
+
+        if (filteredRows.isEmpty) {
+          return Center(
+            child: Text("No valid data to display", style: txtStylegreen),
+          );
+        }
+        return SingleChildScrollView(
+          child: SingleChildScrollView(
+            // padding: EdgeInsets.symmetric(horizontal: 15),
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: constraints.maxWidth,),
+              child: DataTableTheme(
+                data: DataTableThemeData(
+                  headingRowColor: WidgetStateProperty.all(Color(0xff4c7c80)),
+                  dataRowColor: WidgetStateProperty.all(Colors.black),
+                  dividerThickness: 1,
+                ),
+                child:
+                // isPaginated
+                //     ? PaginatedDataTable(
+                //       rowsPerPage: 10,
+                //       columnSpacing: 20,
+                //       showCheckboxColumn: false,
+                //       sortColumnIndex: _sortColumnIndex,
+                //       sortAscending: _sortAscending,
+                //       columns: gasDataSource.getColumns((columnIndex, ascending) {
+                //         setState(() {
+                //           _sortColumnIndex = columnIndex;
+                //           _sortAscending = ascending;
+                //           gasDataSource.sort(columnIndex, ascending);
+                //         });
+                //       }),
+                //       source: gasDataSource,
+                //     )
+                //     :
+                DataTable(
+                  showCheckboxColumn: false,
+                  columnSpacing: 1.0,
+                  columns: columns,
+                  rows:
+                      filteredRows.map((item) {
+                        // log("getgasdata in rows ${widget.getGasData}");
+                           
+                            final matchingGasItem = filteredGasTable.firstWhere(
+    (gasItem) {
+      final isMatch = gasItem['NAME'] == item['name'] &&
+                      gasItem['TYPE'] == item['Type'];  
+      log("Matching check: ${gasItem['NAME']} == ${item['name']} && ${gasItem['TYPE']} == ${item['Type']} => $isMatch");
+      return isMatch;
+    },
+    orElse: () => {},
+  );
+                            final suspiciousRows = getSuspiciousRows(filteredGasTable, matchingGasItem, widget.type);
+                            //  log("suspiciousRows: ${matchingGasItem.length} ()))( $matchingGasItem)");
+                            //  log("suspiciousRows: *****  ${widget.getGasData} ()))() $matchingGasItem ()(()) ${widget.type}");
+                            // final isMatched = matchingGasItem.isNotEmpty;
+                        return DataRow(
+                          cells: gasDataSource.getRowCells(item,matchingGasItem,suspiciousRows,widget.type), 
+                          onSelectChanged: (selected) {
+                             if ((selected ?? false) && widget.onRowSelected != null) {
+                          widget.onRowSelected!(item);
+                        }
+                           },
+                        );
+                      }).toList(), 
+                ),
+              ),
             ),
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -137,34 +152,70 @@ class _GasTableDataState extends State<GasTableData> {
 class _GasDataSource extends DataTableSource {
   final BuildContext context;
   List<Map<String, dynamic>> gasTableData;
+  List<Map<String, dynamic>> gasData;
   final String type;
 
-  _GasDataSource(this.gasTableData, this.type, this.context);
+  _GasDataSource(this.gasTableData,this.gasData, this.type, this.context);
 
   @override
   DataRow getRow(int index) {
     final item = gasTableData[index];
+     final matchingItem = gasData.firstWhere(
+    (e) => e['name'] == item['name'] && e['type'] == item['type'],
+    orElse: () => {},
+  );
+   
+    final suspiciousRows = getSuspiciousRows(gasData, matchingItem, type);
+    log("suspiciousRows  $suspiciousRows");
+
 
     return DataRow.byIndex(
       index: index,
-      cells: getRowCells(item),
+      cells: getRowCells(item,matchingItem,suspiciousRows,type),
       onSelectChanged: (selected) {
         if (selected ?? false) {
-          
           print('Row clicked: ${item['name']}');
         }
       },
     );
   }
 
-  List<DataCell> getRowCells(Map<String, dynamic> item) {
+  List<DataCell> getRowCells(Map<String, dynamic> item, Map<String, dynamic> gasItem,List<Map<String, dynamic>> suspiciousRows, String type) {
     final fieldKeys = rowMap[type];
+    // log("msg getrows *** itme $gasItem");
+    // log("msg getrows *** $item");
+
+    // final suspiciousItems = getSuspiciousRows(gasTableData, gasItem, type);
+
+    final suspiciousParams = suspiciousRows.map((e) => e["PARAMETER_CODE"]).toSet();
+  final suspiciousKeys = suspiciousParams.map((p) => parameterToKeyMap[p]).whereType<String>().toSet();
+
+
+    // final filteredRows = gasTableData.where((item) {
+    //   return fieldKeys!.every((key) {
+    //     final value = item[key];
+    //     return value != null && value.toString().trim().isNotEmpty;
+    //   });
+    // }).toList();
 
     // If type is not mapped, fallback to empty or all keys (as needed)
     if (fieldKeys != null) {
       return fieldKeys.map((key) {
+        
         final value = item[key];
-        return DataCell(Text(value?.toString() ?? '', style: txtStyleWhite));
+        // log("msg getrows (()()))() $value");
+        final isNameField = key.toLowerCase() == 'name';
+        final isSuspicious = suspiciousKeys.contains(key); 
+        log("fieldKeys isSusus $isSuspicious");
+        return DataCell(
+          Text(
+            value?.toString() ?? '',
+            style: isSuspicious
+              ? TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)
+              : type == "COMP" ?  txtStyleWhiteB : isNameField ? txtStyleWhiteU : txtStylegreen,
+            textScaler: TextScaler.linear(0.9),
+          ),
+        );
       }).toList();
     } else {
       return item.values.map((value) {
@@ -180,7 +231,11 @@ class _GasDataSource extends DataTableSource {
     if (fields != null) {
       return List.generate(fields.length, (index) {
         return DataColumn(
-          label: Text(fields[index]),
+          label: Text(
+            fields[index],
+            style: txtStyleYellow,
+            textScaler: TextScaler.linear(1.0),
+          ),
           onSort:
               (columnIndex, ascending) =>
                   onSortCallback(columnIndex, ascending),
@@ -232,3 +287,31 @@ class _GasDataSource extends DataTableSource {
   @override
   int get selectedRowCount => 0;
 }
+List<Map<String, dynamic>> getSuspiciousRows(
+  List<Map<String, dynamic>> gasData,
+  Map<String, dynamic> data,
+  String type,
+) {
+  final codes = parameterCodeMap[type];
+  if (codes == null) return [];
+
+  return gasData.where((item) {
+    final regionMatch = item["REGION"] == (["INJT", "EPP", "GASQ", "CSCP"].contains(type)
+        ? data["Parameter_Code"]
+        : data["Region"]);
+    final typeMatch = item["TYPE"] == data["Type"];
+    final nameMatch = item["NAME"] == data["name"];
+    final paramMatch = codes.contains(item["PARAMETER_CODE"]);
+    return regionMatch && typeMatch && nameMatch && paramMatch;
+  }).toList();
+}
+List<String> getSuspiciousKeysForType(String type) {
+  final paramCodes = parameterCodeMap[type] ?? [];
+  final suspiciousKeys = paramCodes
+      .map((code) => parameterToKeyMap[code])
+      .whereType<String>()
+      .toSet()
+      .toList();
+  return suspiciousKeys;
+}
+

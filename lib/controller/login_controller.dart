@@ -2,7 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart'; 
 import 'package:gail_pipeline/repo/repository.dart';
-import 'package:gail_pipeline/utils/common_loader.dart'; 
+import 'package:gail_pipeline/utils/common_loader.dart';
+import 'package:gail_pipeline/utils/secure_storage.dart'; 
 import 'package:get/get.dart';
 
 class LoginController extends GetxController{
@@ -19,12 +20,12 @@ class LoginController extends GetxController{
     if (res != null && res.response == true) {
       log("==-=-=${res.message }");
       CommonLoader.hideLoading();
+      LocalStorage.setUserDetails(userIDController.text.trim(),passwordController.text.trim()); 
       Get.offAllNamed("/homeScreen");
-
     }
        else {
         CommonLoader.hideLoading();
-       log("else ****==-=-=${res!.message}");
+        log("else ****==-=-=${res!.message}");
         Get.defaultDialog(
               middleText: res.message.toString(),
               textConfirm: 'OK',

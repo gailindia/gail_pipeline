@@ -6,15 +6,16 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:gail_pipeline/constants/app_constants.dart';
 import 'package:gail_pipeline/controller/login_controller.dart';
+import 'package:gail_pipeline/utils/secure_storage.dart';
 import 'package:gail_pipeline/widgets/dialog_with_timer.dart';
 import 'package:gail_pipeline/widgets/loadingview.dart';
+import 'package:gail_pipeline/widgets/styles/mytextStyle.dart';
 
 import 'package:get/get.dart';
 
-import 'package:secure_shared_preferences/secure_shared_pref.dart';
+ 
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -43,153 +44,195 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
+    fetchSecureStorageData();
     super.initState();
   }
+  
+Future<void> fetchSecureStorageData() async {
+loginController.userIDController.text = await LocalStorage.getUserName() ?? "";
+loginController.passwordController.text = await LocalStorage.getPassWord() ?? "";
+}
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(image: AssetImage(bgImage), fit: BoxFit.cover),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: SingleChildScrollView(
+    return SafeArea(
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(image: AssetImage(bgImage), fit: BoxFit.cover),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SingleChildScrollView(
             child: Form(
               key: _formKey,
               child: Column(
                 children: [
+                  // Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: Visibility(
+                  //     visible: otpvisible,
+                  //     child: InkWell(
+                  //       onTap: () {
+                  //         if (otpvisible == true) {
+                  //           otpvisible = false;
+                  //           numbervisible = true;
+                  //           setState(() {});
+                  //         }
+                  //       },
+                  //       child: Icon(
+                  //         Icons.arrow_back,
+                  //         color: Colors.red,
+                  //         size: 25,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Visibility(
-                      visible: otpvisible,
-                      child: InkWell(
-                        onTap: () {
-                          if (otpvisible == true) {
-                            otpvisible = false;
-                            numbervisible = true;
-                            setState(() {});
-                          }
-                        },
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: Colors.red,
-                          size: 25,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 100.0),
+                    padding: EdgeInsets.only(top: 50.0, bottom: 50),
                     child: Image.asset(
                       kIconLogo,
-                      height: 100,
-                      width: 150,
+                      height: 80,
+                      width: 120,
                       fit: BoxFit.fill,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      top: 20.0,
-                      left: 30,
-                      right: 30,
-                      bottom: 4,
-                    ),
-                    child: TextFormField(
-                      minLines: 1,
-                      autocorrect: false,
-                      keyboardType: TextInputType.multiline,
-                      controller: loginController.userIDController,
-                      textCapitalization: TextCapitalization.sentences,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'User Id is empty';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(color: Colors.red, width: 2.0),
-                        ),
-                        labelText: "User ID",
-                        prefixIcon: Icon(Icons.person_outline_rounded),
-                        contentPadding: const EdgeInsets.all(12),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            width: 1,
-                            color: Colors.indigo,
-                          ),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 2,
-                            color: Colors.indigo,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      top: 10.0,
-                      left: 30,
-                      right: 30,
-                      bottom: 4,
-                    ),
-                    child: TextFormField(
-                      minLines: 1,
-                      autocorrect: false,
-                      obscureText: true,
-                      keyboardType: TextInputType.multiline,
-                      controller: loginController.passwordController,
-                      textCapitalization: TextCapitalization.sentences,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Password is empty';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          // ignore: prefer_const_constructors
-                          borderSide: BorderSide(color: Colors.red, width: 2.0),
-                        ),
-                        labelText: "Password",
-                        prefixIcon: Icon(Icons.person_outline_rounded),
-                        contentPadding: const EdgeInsets.all(12),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            width: 1,
-                            color: Colors.indigo,
-                          ),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 2,
-                            color: Colors.indigo,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Get.offAllNamed('/homeScreen');
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
-                        log("call login");
 
-                        loginController.loginUser();
-                      }
-                    },
-                    child: Text("Login"),
+                  Container(
+                    padding: EdgeInsets.all(15),
+                    margin: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                    decoration: BoxDecoration(
+                      color: Color(0xff37322D),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 40,
+                          child: TextFormField(
+                            minLines: 1,
+                            autocorrect: false,
+                            keyboardType: TextInputType.multiline,
+                            controller: loginController.userIDController,
+                            textCapitalization: TextCapitalization.sentences,
+                            maxLength: 30,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'User Id is empty';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              fillColor: Colors.white,
+                              filled: true,
+                              counterText: '',
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 2.0,
+                                ),
+                              ),
+                              hintText: "Username",
+                              hintStyle: txtStylegrey,
+                              // prefixIcon: Icon(Icons.person_outline_rounded),
+                              contentPadding: const EdgeInsets.all(12),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  width: 1,
+                                  color: Colors.indigo,
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Colors.indigo,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        SizedBox(
+                          height: 40,
+                          child: TextFormField(
+                            minLines: 1,
+                            autocorrect: false,
+                            obscureText: true,
+                            keyboardType: TextInputType.multiline,
+                            controller: loginController.passwordController,
+                            textCapitalization: TextCapitalization.sentences,
+                            maxLength: 20,
+                            // maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Password is empty';
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              fillColor: Colors.white,
+                              filled: true,
+                              counterText: '',
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 2.0,
+                                ),
+                              ),
+                              hintText: "Password",
+                              hintStyle: txtStylegrey,
+                              //  prefixIcon: Icon(Icons.person_outline_rounded),
+                              contentPadding: const EdgeInsets.all(12),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  width: 1,
+                                  color: Colors.indigo,
+                                ),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Colors.indigo,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 25),
+                        InkWell(
+                          onTap: () {
+                            // Get.offAllNamed('/homeScreen');
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              log("call login");
+
+                              loginController.loginUser();
+                            }
+                          },
+
+                          child: Container(
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Color(0xffBE2023),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+
+                            child: Text(
+                              "Login".toUpperCase(),
+                              style: txtStyleWhite,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

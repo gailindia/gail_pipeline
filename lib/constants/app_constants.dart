@@ -31,3 +31,4 @@ const String getGasDataUrl = "GetGasData";
 const String saveAccessDataUrl = "saveAccessData";
 const String getEmployeeByNameUrl = "GetEmployeeByName";
 const String getAcessdatabyAppCodeUrl = "GetAcessdataby_App_Code";
+const String getGraphUrl = "GetGasStationDataByHourWiseData";

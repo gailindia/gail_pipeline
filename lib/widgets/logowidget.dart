@@ -9,10 +9,10 @@ class LogoWidget extends StatelessWidget {
   final double? width, height;
 
   const LogoWidget({
-    Key? key,
+    super.key,
     this.width,
     this.height,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) => Image(

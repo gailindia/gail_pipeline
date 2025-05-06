@@ -1,41 +1,40 @@
 
 
 import 'dart:async';
+import 'dart:developer';
+ 
 
-import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/material.dart'; 
 import 'package:gail_pipeline/constants/app_constants.dart';
-import 'package:gail_pipeline/ui/login_screen.dart';
+import 'package:gail_pipeline/utils/secure_storage.dart'; 
 import 'package:gail_pipeline/widgets/logowidget.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:google_fonts/google_fonts.dart'; 
 
 
-import 'package:secure_shared_preferences/secure_shared_pref.dart';
-
-import '../main.dart';
+ 
+ 
 
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({key});
+  const SplashScreen({super.key,});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  // final PRMSServices _prmsServices = Get.put(PRMSServices());
+class _SplashScreenState extends State<SplashScreen> { 
+
   @override
-  void initState() {
-    // TODO: implement initState
+  void initState() { 
     super.initState();
+    _navigateToNextScreen();
   
       Timer(
         const Duration(seconds: 5),
             () =>
-                Get.toNamed('/homeScreen')
-                // Get.toNamed('/loginScreen')
+                // Get.toNamed('/homeScreen')
+                Get.toNamed('/loginScreen')
 
     );
 
@@ -56,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const LogoWidget(),
+              const LogoWidget(height: 120,),
               SizedBox(height: 12),
               Column(
                 children: [
@@ -112,8 +111,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // debugPrint('fcm token is: ${SharedPrefs.to.fcmToken}');
    try{
-     SecureSharedPref pref = await SecureSharedPref.getInstance();
-     String? userID = await pref.getString("Cpf_Number",isEncrypted: true);
+ 
+     String? userID = await LocalStorage.getToken() ?? "";
+     log("token splash $userID");
 
      await Future.delayed(const Duration(seconds: 3));
      // ignore: use_build_context_synchronously
