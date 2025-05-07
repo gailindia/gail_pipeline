@@ -7,8 +7,7 @@ void logout(BuildContext context) {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        backgroundColor: Color(0xff282824),
-        title: Text('INFO',style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xff282824), 
         content: const Text('Are you sure you want to logout?',style: TextStyle(color: Colors.white)),
         actions: <Widget>[
           TextButton(

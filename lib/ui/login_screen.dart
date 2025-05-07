@@ -1,16 +1,12 @@
-// ignore_for_file: prefer_const_constructors, unused_local_variable, unused_field, use_build_context_synchronously
+ 
 
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/material.dart'; 
 import 'package:gail_pipeline/constants/app_constants.dart';
 import 'package:gail_pipeline/controller/login_controller.dart';
-import 'package:gail_pipeline/utils/secure_storage.dart';
-import 'package:gail_pipeline/widgets/dialog_with_timer.dart';
-import 'package:gail_pipeline/widgets/loadingview.dart';
+import 'package:gail_pipeline/utils/secure_storage.dart'; 
 import 'package:gail_pipeline/widgets/styles/mytextStyle.dart';
 
 import 'package:get/get.dart';
@@ -25,8 +21,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  LoginController loginController = Get.put(LoginController());
-  // final PRMSServices _prmsServices = Get.put(PRMSServices());
+  LoginController loginController = Get.put(LoginController()); 
   final _formKey = GlobalKey<FormState>();
 
   bool numbervisible = true;
@@ -44,19 +39,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    fetchSecureStorageData();
+    fetchSecureStorageData();  
     super.initState();
   }
   
 Future<void> fetchSecureStorageData() async {
 loginController.userIDController.text = await LocalStorage.getUserName() ?? "";
 loginController.passwordController.text = await LocalStorage.getPassWord() ?? "";
+ if (loginController.userIDController.text.isNotEmpty && loginController.passwordController.text.isNotEmpty) { 
+      loginController.loginUser(); 
+    } 
 }
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    // fetchSecureStorageData(); 
     return SafeArea(
       child: Container(
         decoration: BoxDecoration(
@@ -68,27 +65,7 @@ loginController.passwordController.text = await LocalStorage.getPassWord() ?? ""
             child: Form(
               key: _formKey,
               child: Column(
-                children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: Visibility(
-                  //     visible: otpvisible,
-                  //     child: InkWell(
-                  //       onTap: () {
-                  //         if (otpvisible == true) {
-                  //           otpvisible = false;
-                  //           numbervisible = true;
-                  //           setState(() {});
-                  //         }
-                  //       },
-                  //       child: Icon(
-                  //         Icons.arrow_back,
-                  //         color: Colors.red,
-                  //         size: 25,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
+                children: [ 
                   Padding(
                     padding: EdgeInsets.only(top: 50.0, bottom: 50),
                     child: Image.asset(
@@ -206,8 +183,7 @@ loginController.passwordController.text = await LocalStorage.getPassWord() ?? ""
 
                         SizedBox(height: 25),
                         InkWell(
-                          onTap: () {
-                            // Get.offAllNamed('/homeScreen');
+                          onTap: () { 
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
                               log("call login");

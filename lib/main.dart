@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gail_pipeline/routes/my_router.dart';
-import 'package:gail_pipeline/ui/splash_screen.dart';
+import 'package:gail_pipeline/routes/my_router.dart'; 
 import 'package:get/get.dart';
 
 void main() {

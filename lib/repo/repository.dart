@@ -104,7 +104,8 @@ class APIService extends GetConnect {
         textConfirm: 'OK',
         confirmTextColor: Colors.white,
         onConfirm: () {
-          Get.back();
+           Get.offAllNamed('/loginScreen');
+          // Get.back();
           // isApiCalling(false);
           // update();
         },
@@ -140,7 +141,8 @@ class APIService extends GetConnect {
         textConfirm: 'OK',
         confirmTextColor: Colors.white,
         onConfirm: () {
-          Get.back();
+           Get.offAllNamed('/loginScreen');
+          // Get.back();
           // isApiCalling(false);
           // update();
         },
@@ -167,7 +169,7 @@ class APIService extends GetConnect {
         'Authorization': 'Bearer $token',
       },
     );
-    log("code &&& ${response.statusCode} $data");
+    // log("code &&& ${response.statusCode} $data");
     if (response.statusCode == 200) {
        final List<dynamic> outerList = response.body;  
      if (outerList.isNotEmpty && outerList[0] is List) {
@@ -185,7 +187,8 @@ class APIService extends GetConnect {
         textConfirm: 'OK',
         confirmTextColor: Colors.white,
         onConfirm: () {
-          Get.back();
+           Get.offAllNamed('/loginScreen');
+          // Get.back();
           // isApiCalling(false);
           // update();
         },
@@ -199,7 +202,8 @@ class APIService extends GetConnect {
         textConfirm: 'OK',
         confirmTextColor: Colors.white,
         onConfirm: () {
-          Get.back();
+           Get.offAllNamed('/loginScreen');
+          // Get.back();
           // isApiCalling(false);
           // update();
         },

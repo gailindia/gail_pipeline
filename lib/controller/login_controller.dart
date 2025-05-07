@@ -14,9 +14,9 @@ class LoginController extends GetxController{
 
    Future<void> loginUser() async{
     CommonLoader.showLoading();
-
+    try{
     final res = await apiService.loginRepo(userId: userIDController.text.trim(),password: passwordController.text.trim());
-     
+      
     if (res != null && res.response == true) {
       log("==-=-=${res.message }");
       CommonLoader.hideLoading();
@@ -36,6 +36,17 @@ class LoginController extends GetxController{
                 update();
               });
       }
+    } catch (e) {
+  CommonLoader.hideLoading();
+  log("Login error: $e");
+
+  Get.defaultDialog(
+    middleText: "Something went wrong. ",
+    textConfirm: 'OK',
+    confirmTextColor: Colors.white,
+    onConfirm: () => Get.back(),
+  );
+    }
     
     // try {
     //     // await showProgressDialog(context);

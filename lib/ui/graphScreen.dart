@@ -30,9 +30,7 @@ class _GasInjectionGraphState extends State<GasInjectionGraph> {
  
 
   @override
-  void initState() {
-   
-
+  void initState() { 
     super.initState();
   }
 String getValueByKey(GraphRespModel data, String key) {
@@ -51,9 +49,7 @@ String getValueByKey(GraphRespModel data, String key) {
     if (graphData.isEmpty) {
       return Center(child: Text('No data available'));
     }
-
  
-
     double minValue = graphData
     .map((e) => double.tryParse(getValueByKey(e, widget.dataKey)) ?? 0)
     .reduce((a, b) => a < b ? a : b);
@@ -76,16 +72,7 @@ if (isSmallRange) {
  double padding = isSmallRange ? 0.005 : range * 0.2;
 
 double adjustedMin = (minValue - padding).clamp(0, minValue);
-double adjustedMax = maxValue + padding;
-
- 
-    // double adjustedMax = (maxValue + padding).roundToDouble();
-
-    // double adjustedMin = (minValue - 10).clamp(0, minValue).roundToDouble();
-    // double adjustedMax = (maxValue + 10).roundToDouble();
-//     if (adjustedMin == adjustedMax) {
-//   adjustedMax = adjustedMin + 10;
-// }
+double adjustedMax = maxValue + padding; 
     return Column(
       children: [
         Container(
@@ -99,13 +86,7 @@ double adjustedMax = maxValue + padding;
                     style: txtStylegrey
                   ),
                 ),
-        SfCartesianChart(
-          // zoomPanBehavior: ZoomPanBehavior(enablePanning: true,
-          // enablePinching: true,
-          // zoomMode: ZoomMode.x,
-          // enableDoubleTapZooming: true,
-          // // This is the important one:
-          // enableSelectionZooming: true,), 
+        SfCartesianChart( 
           plotAreaBorderColor: Colors.transparent, 
           primaryXAxis: CategoryAxis(
             labelPlacement: LabelPlacement.onTicks,
@@ -116,10 +97,8 @@ double adjustedMax = maxValue + padding;
           ),
           primaryYAxis: NumericAxis(
             minimum: adjustedMin,
-            maximum: adjustedMax,
-            //  title: AxisTitle(text: "Flow",textStyle: txtStylegrey) ,
-            title: AxisTitle(text: getUnit(widget.dataKey), textStyle: txtStylegrey),
-        
+            maximum: adjustedMax, 
+            title: AxisTitle(text: getUnit(widget.dataKey), textStyle: txtStylegrey), 
             majorGridLines: MajorGridLines(width: 0),
             interval: interval,
             numberFormat: NumberFormat("##0.000"),labelStyle: txtStylegrey,
@@ -133,16 +112,10 @@ double adjustedMax = maxValue + padding;
           series: <CartesianSeries<GraphRespModel, String>>[
             AreaSeries<GraphRespModel, String>(
               dataSource: widget.graphRespModel,
-              xValueMapper: (GraphRespModel data, _) {
-                // log("xValueMapper $data");
-                // log("xValueMapper ${data.timeStamp}");
-        
+              xValueMapper: (GraphRespModel data, _) { 
                 return data.timeStamp.toString();
               },
-              yValueMapper: (GraphRespModel data, _) {
-                // log("xValueMapper yyyy $data");
-                // log("xValueMapper yyy ${data.flow.toString()}");
-                // return double.parse(data.flow.toString());
+              yValueMapper: (GraphRespModel data, _) { 
                 return double.tryParse(getValueByKey(data, widget.dataKey)) ?? 0;
               },
               
@@ -176,6 +149,14 @@ Map<String, Map<String, String>> dataLabels = {
     'unit': 'KSCMH',
   },
   'FedGas_PR': {
+    'label': 'Flow',
+    'unit': 'Kg/cm²',
+  },
+  'Inlet': {
+    'label': 'Inlet',
+    'unit': 'KSCMH',
+  },
+   'Flow': {
     'label': 'Flow',
     'unit': 'Kg/cm²',
   },

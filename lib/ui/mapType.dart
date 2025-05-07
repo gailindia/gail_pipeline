@@ -19,7 +19,7 @@
 };
 
 //////**** parameter to key map ********////////////
-final Map<String, String> parameterToKeyMap = {
+final Map<String, String> parameterCodeToFieldMap = {
   "FLOW": "Flow",
   "INLTP": "Inlet",
   "OUTLP": "Discharg",
@@ -29,7 +29,7 @@ final Map<String, String> parameterToKeyMap = {
   "PLTPN": "Plant_Load_Percentage",
   "EPPR": "FedGas_PR",
   "EPFW": "FedGas_Volume",
-  "PRSS": "Inlet",
+  "PRSS": "FedGas_PR",
   "CFLW": "Flow",
   "GAC2": "FedGas_PR",
   "GAC3": "FedGas_Volume",
@@ -57,6 +57,8 @@ final headersMap = {
   "LPK": ['Name', 'Region', 'Vol\n(MMSCM)'],
   "RMXN": ['Name', 'Region', 'FLow\n(KSCMH)'],
 };
+ 
+
 /////////////////////////// row data /////////////////////////////////////
 final rowMap = {
   "COMP": ['name', 'Inlet', 'Discharg', 'Flow'],
@@ -90,4 +92,7 @@ final rowMap = {
 
     return typeMap[title] ?? 'OTHER';
   }
+ String normalizeKey(dynamic value) {
+  return (value ?? '').toString().toLowerCase().trim();
+}
  

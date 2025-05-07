@@ -1,7 +1,6 @@
 import 'dart:developer';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:gail_pipeline/repo/repository.dart';
+import 'package:connectivity_plus/connectivity_plus.dart'; 
 
 Future<bool> checkConnectivity() async {
   try {

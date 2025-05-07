@@ -27,20 +27,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() { 
-    super.initState();
-    _navigateToNextScreen();
+    super.initState(); 
   
       Timer(
         const Duration(seconds: 5),
-            () =>
-                // Get.toNamed('/homeScreen')
-                Get.toNamed('/loginScreen')
+            () =>  Get.offAllNamed('/loginScreen')
+              // _navigateToNextScreen()
 
-    );
-
+    ); 
    
-
-    // _navigateToNextScreen();
   }
 
   @override
@@ -107,28 +102,21 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  _navigateToNextScreen() async {
-
-    // debugPrint('fcm token is: ${SharedPrefs.to.fcmToken}');
+  _navigateToNextScreen() async { 
    try{
  
-     String? userID = await LocalStorage.getToken() ?? "";
-     log("token splash $userID");
+     String? userToken = await LocalStorage.getToken();
+     log("token splash $userToken"); 
+     if(userToken != null){
 
-     await Future.delayed(const Duration(seconds: 3));
-     // ignore: use_build_context_synchronously
-     if (userID == null) {
-       // ignore: use_build_context_synchronously
-      //  Navigator.pushReplacement(context,
-      //      MaterialPageRoute(builder: (context) => const LoginScreen()));
-     } else {
-       // ignore: use_build_context_synchronously
-      //  Navigator.pushReplacement(context,
-      //      // MaterialPageRoute(builder: (context) => const HomeScreen()));
-      //      MaterialPageRoute(builder: (context) => const CGDPermitApp(name:"INJT")));
+                Get.offAllNamed('/homeScreen');
+     } else{
+
+                Get.offAllNamed('/loginScreen');
      }
    }catch(e){
-
+    log("splash catch ${e.toString()}");
+     Get.offAllNamed('/loginScreen'); 
    }
    }
 

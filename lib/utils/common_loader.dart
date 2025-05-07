@@ -63,9 +63,7 @@ class CommonLoader {
     );
   }
 
-  //show toast
-  //show snack bar
-  //show loading
+  
   static void showLoading([String? message]) {
     Get.dialog(
         Dialog(
