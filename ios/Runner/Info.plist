@@ -45,9 +45,13 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
- 	<key>NSAllowsArbitraryLoads</key>
- 
-</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app needs local network access to debug the app.</string>
+
+	<key>NSBonjourServices</key>
+	<array>
+	<string>_dartobservatory._tcp</string>
+	</array>
+	
 </dict>
 </plist>

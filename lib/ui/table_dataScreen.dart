@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:gail_pipeline/ui/mapType.dart';
 import 'package:gail_pipeline/widgets/styles/mytextStyle.dart';
-import 'package:get/get.dart';
 
 class GasTableData extends StatefulWidget {
   final List<Map<String, dynamic>> gasTableData;
@@ -24,12 +23,9 @@ class GasTableData extends StatefulWidget {
 }
 
 class _GasTableDataState extends State<GasTableData> {
-  int _sortColumnIndex = 0;
-  bool _sortAscending = true;
-  RxString matchHedrType = "".obs;
-  RxString matchNameStn = "".obs;
-  RxInt matchclmnIndx = 0.obs;
-
+  int sortColumnIndex = 0;
+  bool sortAscending = true;
+  final List<MatchedList> matchedItems = [];
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +36,12 @@ class _GasTableDataState extends State<GasTableData> {
       context,
     );
 
-    final columns = gasDataSource.getColumns((columnIndex, ascending) {});
+    final columns = gasDataSource.getColumns((columnIndex, ascending) {
+      setState(() {
+        sortColumnIndex = columnIndex;
+        sortAscending = ascending;
+      });
+    });
 
     if (columns.isEmpty) {
       return const Center(child: Text("No columns to display"));
@@ -61,13 +62,26 @@ class _GasTableDataState extends State<GasTableData> {
             }).toList();
         final filteredGasTable =
             widget.getGasData.where((element) {
-              //  log("fieldkkk  element ***$fieldKeys");
-
               final type = element['TYPE']?.toString().trim();
-              final tagType = element['TAG_TYPE'] == "B"; 
+              final tagType = element['TAG_TYPE'] == "B";
               return type == widget.type.toString().trim() && tagType;
             }).toList();
- 
+        matchedItems.clear();
+        /////////////////////////////sorting ////////////////////
+        filteredRows.sort((a, b) {
+          final fieldKeys = rowMap[widget.type];
+          if (fieldKeys == null || sortColumnIndex >= fieldKeys.length)
+            return 0;
+
+          final key = fieldKeys[sortColumnIndex];
+          final aValue = a[key]?.toString().toLowerCase() ?? '';
+          final bValue = b[key]?.toString().toLowerCase() ?? '';
+
+          return sortAscending
+              ? aValue.compareTo(bValue)
+              : bValue.compareTo(aValue);
+        });
+        ////////////////////////////////////////
         log("filteredRows ())))) ${filteredRows.length} ()()");
         log(
           "filteredRows ()))))&&&&&& ${filteredGasTable.length} ()() $filteredGasTable",
@@ -78,17 +92,19 @@ class _GasTableDataState extends State<GasTableData> {
             final sameName = gasStnItem['name'] == gasItem['NAME'];
             final sameType = gasStnItem['Type'] == gasItem['TYPE'];
             final parameter = gasItem['PARAMETER_CODE'];
-            final type = widget.type; 
+            final type = widget.type;
             final isRegionMatch =
                 gasStnItem['Region'] == gasItem['REGION'] ||
                 gasStnItem['Parameter_Code'] == gasItem['REGION'];
 
-            if (sameName && sameType && parameterCodeMap[type]?.contains(parameter) == true &&
+            if (sameName &&
+                sameType &&
+                parameterCodeMap[type]?.contains(parameter) == true &&
                 isRegionMatch &&
                 gasItem['TAG_TYPE'] == "B") {
-                   final paramKey = parameterCodeToFieldMap[parameter];
+              final paramKey = parameterCodeToFieldMap[parameter];
               final rowKeys = rowMap[widget.type];
-              final headers = headersMap[widget.type]; 
+              final headers = headersMap[widget.type];
 
               if (paramKey != null && rowKeys != null && headers != null) {
                 final columnIndex = rowKeys.indexWhere(
@@ -96,16 +112,23 @@ class _GasTableDataState extends State<GasTableData> {
                 );
 
                 if (columnIndex != -1 && columnIndex < headers.length) {
-                  final header = headers[columnIndex]; 
+                  final header = headers[columnIndex];
+
                   log(
                     " Matched param: $parameter → key: $paramKey → column: $columnIndex → header: $header row $gasItem gggg $gasStnItem",
                   );
-                  matchHedrType.value = header;
-                  matchNameStn.value = gasStnItem['name'].toString().trim();
-                  matchclmnIndx.value = columnIndex;
+                  matchedItems.add(
+                    MatchedList(
+                      header,
+                      gasStnItem['name'].toString(),
+                      columnIndex,
+                    ),
+                  );
+                  log("matched itmes $matchedItems");
+
                   log(
-                "msg type $type matched param: $parameter &&&&& ${gasItem['NAME']} ***** ${gasStnItem['name'] } ***** $header",
-              );
+                    "msg type $type matched param: $parameter &&&&& ${gasItem['NAME']} ***** ${gasStnItem['name']} ***** $header",
+                  );
                 } else {
                   log("paramKey '$paramKey' not found in rowKeys: $rowKeys");
                 }
@@ -123,7 +146,7 @@ class _GasTableDataState extends State<GasTableData> {
           );
         }
         return SingleChildScrollView(
-          child: SingleChildScrollView( 
+          child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: constraints.maxWidth),
@@ -144,9 +167,7 @@ class _GasTableDataState extends State<GasTableData> {
                             item,
                             filteredGasTable,
                             widget.type,
-                            matchHedrType.value,
-                            matchNameStn.value,
-                            matchclmnIndx.value
+                            matchedItems,
                           ),
                           onSelectChanged: (selected) {
                             if ((selected ?? false) &&
@@ -184,13 +205,15 @@ class _GasDataSource extends DataTableSource {
     }, orElse: () => {});
 
     if (matchingItem.isEmpty) {
-      return DataRow.byIndex(index: index, cells: getRowCells(item, [], type,"","",0));
+      return DataRow.byIndex(
+        index: index,
+        cells: getRowCells(item, [], type, []),
+      );
     }
 
     return DataRow.byIndex(
       index: index,
-      cells: getRowCells(item, [], type,"","",0),
-      // cells: getRowCells(item,matchingItem,type),
+      cells: getRowCells(item, [], type, []),
       onSelectChanged: (selected) {
         if (selected ?? false) {
           print('Row clicked: 666 ${item['name']}');
@@ -203,41 +226,36 @@ class _GasDataSource extends DataTableSource {
     Map<String, dynamic> item,
     List<Map<String, dynamic>> gasItem,
     String type,
-    String matchedHeader,
-    String matchedHeaderName,
-    int? matchedColumnIndex,
+    List<MatchedList> matchedItemList,
   ) {
     final fieldKeys = rowMap[type];
-    final isMatchedRow = matchedHeader != "" ? matchedHeader : ""; 
-    final isMatchName = matchedHeaderName != "" ? matchedHeaderName : "";
-    
 
-    if (fieldKeys != null) { 
+    if (fieldKeys != null) {
       return fieldKeys.asMap().entries.map((entry) {
-      final index = entry.key;
-      final key = entry.value;
-      final value = item[key];
-      final isNameField = key.toLowerCase() == 'name';
+        final index = entry.key;
+        final key = entry.value;
+        final value = item[key];
+        final isNameField = key.toLowerCase() == 'name';
+        final match = matchedItemList.firstWhere(
+          (m) => m.matchNameStn == item['name'] && m.matchclmnIndx == index,
+          orElse: () => MatchedList("", "", -1),
+        );
+        final isMatchedCell = match.matchclmnIndx != -1;
+        log("getrows  $isMatchedCell ");
 
-
-      final isTargetCell = matchedHeader.isNotEmpty &&
-          matchedHeaderName.isNotEmpty && 
-          matchedColumnIndex == index;
-
-       log("→ item name: ${item['name']}, matchedHeaderName: $matchedHeaderName, matchedColumnIndex: $matchedColumnIndex, current index: $index, isTargetCell: $isTargetCell");
+        log("getrows **** ${matchedItemList.length} ");
 
         return DataCell(
           Text(
             value?.toString() ?? '',
-            style: isNameField
-            ? (type == "COMP")
-            ? txtStyleWhiteB
-             : txtStyleWhiteU
-             : isMatchedRow  != "" && item['name'] == isMatchName  
-             ? isTargetCell
-             ? TextStyle(color: Colors.red, fontWeight: FontWeight.bold)
-             :txtStylegreen
-             :txtStylegreen,  
+            style:
+                isNameField
+                    ? (type == "COMP")
+                        ? txtStyleWhiteB
+                        : txtStyleWhiteU
+                    : isMatchedCell
+                    ? TextStyle(color: Colors.red, fontWeight: FontWeight.bold)
+                    : txtStylegreen,
             textScaler: TextScaler.linear(0.9),
           ),
         );
@@ -263,6 +281,7 @@ class _GasDataSource extends DataTableSource {
           onSort:
               (columnIndex, ascending) =>
                   onSortCallback(columnIndex, ascending),
+          numeric: false,
         );
       });
     } else {
@@ -310,4 +329,12 @@ class _GasDataSource extends DataTableSource {
   int get rowCount => gasTableData.length;
   @override
   int get selectedRowCount => 0;
+}
+
+class MatchedList {
+  final String matchHedrType;
+  final String matchNameStn;
+  final int matchclmnIndx;
+
+  const MatchedList(this.matchHedrType, this.matchNameStn, this.matchclmnIndx);
 }

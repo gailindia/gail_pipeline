@@ -7,9 +7,12 @@ import 'package:gail_pipeline/ui/graphScreen.dart';
 import 'package:gail_pipeline/ui/mapType.dart';
 import 'package:gail_pipeline/ui/table_dataScreen.dart';
 import 'package:gail_pipeline/utils/logout_dialog.dart';
+import 'package:gail_pipeline/widgets/homeBoxWidget.dart';
+import 'package:gail_pipeline/widgets/styles/mytextStyle.dart';
 import 'package:get/get.dart';
 
 class Homescreen extends StatefulWidget {
+  
   const Homescreen({super.key});
 
   @override
@@ -19,13 +22,14 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen>
     with SingleTickerProviderStateMixin {
   HomeController homeController = Get.find<HomeController>();
-  RxString selectedTitle = "Line Pack".obs;
+  // RxString selectedTitle = "Line Pack".obs;
+  ValueNotifier<String> selectedTitle = ValueNotifier("Line Pack");
   RxString selectedSubType = 'DVPL-VDPL'.obs;
   RxString selectedSectorType = 'CGD'.obs;
-  bool isDrawerOpen = false;
+  RxBool isDrawerOpen = false.obs;
   int selectedIndex = 0;
   TabController? tabController;
-  bool showGraph = false;
+  RxBool showGraph = false.obs;
 
   @override
   void initState() {
@@ -35,15 +39,14 @@ class _HomescreenState extends State<Homescreen>
         selectedSubType.value = tabController?.index == 0 ? 'DVPL-VDPL' : 'HVJ';
       }
     });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-    homeController.getGasStaionApi();
-     homeController.getGasDataApi();
-    
-  });  
-    super.initState(); 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      homeController.getGasStaionApi();
+      homeController.getGasDataApi();
+    });
+    super.initState();
   }
-  
-  Widget _buildMenuItem(String title) { 
+
+  Widget _buildMenuItem(String title) {
     return ListTile(
       selectedColor: Color(0xffBCBCBC),
       title: Text(title, style: TextStyle(color: Color(0xffBCBCBC))),
@@ -51,20 +54,25 @@ class _HomescreenState extends State<Homescreen>
       onTap: () {
         if (title == "Log Out") {
           logout(context);
-          setState(() => isDrawerOpen = false);
+          // setState(() =>
+          isDrawerOpen.value = false;
+          //  );
         } else {
           selectedTitle.value = title;
-          setState(() => isDrawerOpen = false);
+          log("else seleted ${selectedTitle.value}");
+          // setState(() =>
+          isDrawerOpen.value = false;
+          // );
         }
       },
     );
   }
 
   @override
-void dispose() {
-  tabController?.dispose();
-  super.dispose();
-}
+  void dispose() {
+    tabController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,10 +89,14 @@ void dispose() {
             padding: const EdgeInsets.only(left: 10.0),
             child: Image.asset(kIconLogo),
           ),
-          title: Text(
-            selectedTitle.value.toUpperCase(),
-            style: TextStyle(color: Colors.white, fontSize: 15),
-          ),
+          title: ValueListenableBuilder<String>(
+            valueListenable: selectedTitle,
+            builder:
+                (context, value, _) => Text(
+                  value.toUpperCase(),
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+          ), 
           actions: [
             IconButton(
               icon: Image.asset(
@@ -94,15 +106,15 @@ void dispose() {
                 fit: BoxFit.cover,
               ),
               onPressed: () {
-                homeController.getGasStaionApi(); 
+                homeController.getGasStaionApi();
               },
             ),
             IconButton(
               icon: Icon(Icons.menu, color: Colors.white),
               onPressed: () {
-                setState(() {
-                  isDrawerOpen = !isDrawerOpen;
-                });
+                // setState(() {
+                isDrawerOpen.value = !isDrawerOpen.value;
+                // });
               },
             ),
           ],
@@ -126,23 +138,21 @@ void dispose() {
           final String currentType = mapTitleToType(selectedTitle.value);
           final String subRegion = selectedSubType.value;
           final String sectRegion = selectedSectorType.value;
-              homeController.getGasStationRespModel
-          .where((e) => e.type == 'CSCP')
-          .forEach((e) => log('region for CSCP: ${e.region}'));
+          homeController.getGasStationRespModel
+              .where((e) => e.type == 'CSCP')
+              .forEach((e) => log('region for CSCP: ${e.region}'));
 
           final filteredDataList =
               homeController.getGasStationRespModel.value.where((item) {
                 if (currentType == 'COMP') {
                   return item.type == currentType && item.region == subRegion;
-                }
-                 else if(currentType == 'CSCP'){
-                  return item.type == currentType && item.region == sectRegion ;
-                }
-                else {
+                } else if (currentType == 'CSCP') {
+                  return item.type == currentType && item.region == sectRegion;
+                } else {
                   return item.type == currentType;
                 }
               }).toList() ??
-              []; 
+              [];
           final dataKeys =
               rowMap[currentType]
                   ?.where(
@@ -154,13 +164,13 @@ void dispose() {
               [];
           if (filteredDataList.isEmpty) {
             return const Center(child: Text("No Data Available"));
-          } 
+          }
           return Column(
             children: [
               AnimatedContainer(
                 color: Color(0xff282824),
                 duration: Duration(milliseconds: 300),
-                height: isDrawerOpen ? 400 : 0,
+                height: isDrawerOpen.value ? 400 : 0,
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -200,7 +210,7 @@ void dispose() {
               selectedTitle.value == 'Compressor Station'
                   ? PreferredSize(
                     preferredSize: Size.fromHeight(35),
-                    child: Container( 
+                    child: Container(
                       margin: EdgeInsets.symmetric(horizontal: 15),
                       child: TabBar(
                         controller: tabController,
@@ -233,136 +243,52 @@ void dispose() {
                     ),
                   )
                   : SizedBox.shrink(),
-              
-             // ////////////////////// CSCP ///////////////////////////////
-                selectedTitle.value == 'Sectorwise Consumption' ?
-                Column(
-                  children: [
-                    ///////////////////////////////// CGD ////////////////////////////////////
-                    InkWell(
-                      onTap: () {
 
-                        selectedSectorType.value = "CGD";
-                        showGraph = false; 
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.only(top: 8,),
-                        margin: EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 5),
-                        color: Color(0xffCCCCCC),
-                        child: Column(
-                          children: [
-                            Text(
-                              "CGD".toUpperCase(),
-                              style: TextStyle(fontWeight: FontWeight.w500,
-                                  color: Color(0xff8c1818)),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              height: 6,
-                              color: Color(0xff8c1818),
-                            )
-                          ],
-                        ),
+              // ////////////////////// CSCP ///////////////////////////////
+              selectedTitle.value == 'Sectorwise Consumption'
+                  ? Column(
+                    children: [
+                      ///////////////////////////////// CGD ////////////////////////////////////
+                      Homeboxwidget(
+                        onTapCall: () {
+                          selectedSectorType.value = "CGD";
+                          showGraph.value = false;
+                        },
+                        txtTitle: "CGD".toUpperCase(),
                       ),
-                    ),
-                    // /////////////////////////////// Fertiliser ////////////////////////////////////
-                    InkWell(
-                      onTap: () {
-                        selectedSectorType.value = "Fertiliser";
-                        showGraph = false;
-                         
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.only(top: 8,),
-                        margin: EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 5),
-                        color: Color(0xffCCCCCC),
-                        child: Column(
-                          children: [
-                            Text(
-                              "Fertiliser",
-                              style: TextStyle(fontWeight: FontWeight.w500,
-                                  color: Color(0xff8c1818)),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              height: 6,
-                              color: Color(0xff8c1818),
-                            )
-                          ],
-                        ),
+
+                      // /////////////////////////////// Fertiliser ////////////////////////////////////
+                      Homeboxwidget(
+                        onTapCall: () {
+                          selectedSectorType.value = "Fertiliser";
+                          showGraph.value = false;
+                        },
+                        txtTitle: "Fertiliser",
                       ),
-                    ),
-                    // /////////////////////////////// Power ////////////////////////////////////
-                    InkWell(
-                      onTap: () {
-                        selectedSectorType.value = "Power";
-                        showGraph = false;
-                         
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.only(top: 8,),
-                        margin: EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 5),
-                        color: Color(0xffCCCCCC),
-                        child: Column(
-                          children: [
-                            Text(
-                              "Power",
-                              style: TextStyle(fontWeight: FontWeight.w500,
-                                  color: Color(0xff8c1818)),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              height: 6,
-                              color: Color(0xff8c1818),
-                            )
-                          ],
-                        ),
+
+                      // /////////////////////////////// Power ////////////////////////////////////
+                      Homeboxwidget(
+                        onTapCall: () {
+                          selectedSectorType.value = "Power";
+                          showGraph.value = false;
+                        },
+                        txtTitle: "Power",
                       ),
-                    ),
-                  ],
-                )
-                : SizedBox.shrink(),
-                selectedTitle.value != 'Compressor Station' &&
-                    selectedTitle.value != 'Sectorwise Consumption' ?
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      showGraph = false;
-                    });
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.only(top: 8,),
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-                    color: Color(0xffCCCCCC),
-                    child: Column(
-                      children: [
-                        Text(
-                          "Trunk".toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.w500,
-                              color: Color(0xff8c1818)),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          height: 6,
-                          color: Color(0xff8c1818),
-                        )
-                      ],
-                    ),
-                  ),
-                ) : SizedBox.shrink(), 
-             
-              !showGraph
+                    ],
+                  )
+                  : SizedBox.shrink(),
+
+              selectedTitle.value != 'Compressor Station' &&
+                      selectedTitle.value != 'Sectorwise Consumption'
+                  ? Homeboxwidget(
+                    onTapCall: () {
+                      showGraph.value = false;
+                    },
+                    txtTitle: "Trunk".toUpperCase(),
+                  )
+                  : SizedBox.shrink(),
+
+              !showGraph.value
                   ? Container(
                     width: double.infinity,
                     alignment: Alignment.center,
@@ -381,10 +307,10 @@ void dispose() {
                       ],
                     ),
                   )
-                  : SizedBox.shrink(), 
+                  : SizedBox.shrink(),
               Expanded(
                 child:
-                    showGraph
+                    showGraph.value
                         ? ListView.builder(
                           itemCount: dataKeys.length,
                           shrinkWrap: true,
@@ -417,7 +343,10 @@ void dispose() {
                           ),
                           child: GasTableData(
                             getGasData:
-                                (homeController.getGasDataRespModel?.isNotEmpty ?? false)
+                                (homeController
+                                            .getGasDataRespModel
+                                            ?.isNotEmpty ??
+                                        false)
                                     ? (homeController.getGasDataRespModel ?? [])
                                         .map((g) => g.toJson())
                                         .toList()
@@ -428,23 +357,35 @@ void dispose() {
                                     .toList(),
                             type: mapTitleToType(selectedTitle.value),
                             onRowSelected: (item) async {
-                              if(selectedTitle.value != 'Compressor Station'){
-                                 homeController.name.value = item['name'];
-                              homeController.region.value = item['Region'];
-                              homeController.type.value = item['Type'];
+                              if (selectedTitle.value != 'Compressor Station') {
+                                homeController.name.value = item['name'];
+                                homeController.region.value = item['Region'];
+                                homeController.type.value = item['Type'];
 
-                              await homeController.getGraphApi(); 
-                              setState(() {
+                                await homeController.getGraphApi();
+                                // setState(() {
                                 homeController.getGraphRespModel;
-                                showGraph = true;
-                              }); 
+                                showGraph.value = true;
+                                // });
                               }
-                             
-                             
                             },
                           ),
                         ),
               ),
+              SizedBox(height: 10),
+                Text.rich(
+            TextSpan(
+              text: 'Red Colour ',style: TextStyle(color: Colors.red,fontWeight: FontWeight.w600),
+              children: <InlineSpan>[
+                TextSpan(
+                  text: ': Suspicious Data',
+                  style: txtStyleWhite,
+                )
+              ]
+            )
+          ),
+
+              SizedBox(height: 15),
             ],
           );
         }),
