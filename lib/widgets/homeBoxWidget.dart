@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class Homeboxwidget extends StatelessWidget {
   final String txtTitle;
   final VoidCallback onTapCall;
+    final bool isSelected;
   const Homeboxwidget({
     super.key,
     required this.txtTitle,
     required this.onTapCall,
+    required this.isSelected,
   });
 
   @override
@@ -31,7 +33,7 @@ class Homeboxwidget extends StatelessWidget {
             Container(
               width: double.infinity,
               height: 6,
-              color: Color(0xff8c1818),
+              color: isSelected ? const Color(0xff8c1818) : Color(0xffCCCCCC),
             ),
           ],
         ),
