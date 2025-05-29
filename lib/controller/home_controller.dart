@@ -53,13 +53,9 @@ class HomeController extends GetxController{
 
   ///////////************* graph data  ****//////////////////////////////
   Future<void> getGraphApi() async{
-    pr = ProgressDialog(
-      Get.context!,
-      isDismissible: true,
-    );
-    pr.show();
+
     getGraphRespModel.value =  await apiService.getGraphDataRepo(type: type.value.trim(),region:region.value.trim(),name: name.value.trim()) ?? [];
-    pr.hide();
+
     log("getGraphRespModel controller ${getGraphRespModel?.length}  ${pr.isShowing()}");
     // getGraphRespModel =  await apiService.getGraphDataRepo(type.value.toUpperCase(),region.value.toUpperCase(),name.value.toUpperCase());
   }
