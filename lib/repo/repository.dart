@@ -13,7 +13,10 @@ import 'package:gail_pipeline/model/login_respModel.dart';
 import 'package:gail_pipeline/utils/secure_storage.dart';
 
 import 'package:get/get.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
+
+late ProgressDialog pr;
 class APIService extends GetConnect {
   //   ///////////////********************* send error logs ****************///////////////////////
   //   sendErrorLogs({

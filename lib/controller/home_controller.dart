@@ -7,9 +7,11 @@ import 'package:gail_pipeline/model/graph_respModel.dart';
 import 'package:gail_pipeline/repo/repository.dart';
 import 'package:gail_pipeline/utils/common_loader.dart'; 
 import 'package:get/get.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
 class HomeController extends GetxController{
    final APIService apiService = Get.put(APIService());
+   late ProgressDialog pr;
      RxBool isLoading = true.obs;
    
     RxString syncDate = "".obs;
@@ -48,10 +50,17 @@ class HomeController extends GetxController{
     } 
   } 
 
+
   ///////////************* graph data  ****//////////////////////////////
   Future<void> getGraphApi() async{
+    pr = ProgressDialog(
+      Get.context!,
+      isDismissible: true,
+    );
+    pr.show();
     getGraphRespModel.value =  await apiService.getGraphDataRepo(type: type.value.trim(),region:region.value.trim(),name: name.value.trim()) ?? [];
-    log("getGraphRespModel controller ${getGraphRespModel?.length}");
+    pr.hide();
+    log("getGraphRespModel controller ${getGraphRespModel?.length}  ${pr.isShowing()}");
     // getGraphRespModel =  await apiService.getGraphDataRepo(type.value.toUpperCase(),region.value.toUpperCase(),name.value.toUpperCase());
   }
 }
