@@ -12,7 +12,6 @@ import 'package:gail_pipeline/widgets/styles/mytextStyle.dart';
 import 'package:get/get.dart';
 
 class Homescreen extends StatefulWidget {
-  
   const Homescreen({super.key});
 
   @override
@@ -49,7 +48,7 @@ class _HomescreenState extends State<Homescreen>
   Widget _buildMenuItem(String title) {
     return ListTile(
       selectedColor: Color(0xffBCBCBC),
-      title: Text(title, style: TextStyle(color: Color(0xffBCBCBC))),
+      title: Text(title, style: TextStyle(color: Color(0xffBCBCBC),fontWeight: FontWeight.w500,fontSize: 16)),
       visualDensity: VisualDensity(horizontal: 0, vertical: -4),
       onTap: () {
         if (title == "Log Out") {
@@ -60,6 +59,7 @@ class _HomescreenState extends State<Homescreen>
         } else {
           selectedTitle.value = title;
           log("else seleted ${selectedTitle.value}");
+          showGraph.value = false;
           // setState(() =>
           isDrawerOpen.value = false;
           // );
@@ -96,7 +96,7 @@ class _HomescreenState extends State<Homescreen>
                   value.toUpperCase(),
                   style: TextStyle(color: Colors.white, fontSize: 15),
                 ),
-          ), 
+          ),
           actions: [
             IconButton(
               icon: Image.asset(
@@ -165,228 +165,279 @@ class _HomescreenState extends State<Homescreen>
           if (filteredDataList.isEmpty) {
             return const Center(child: Text("No Data Available"));
           }
-          return Column(
-            children: [
-              AnimatedContainer(
-                color: Color(0xff282824),
-                duration: Duration(milliseconds: 300),
-                height: isDrawerOpen.value ? 400 : 0,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildMenuItem('Compressor Station'),
-                      _buildMenuItem('Gas Injection'),
-                      _buildMenuItem('GPU'),
-                      _buildMenuItem('End Point Pressure'),
-                      _buildMenuItem('Sectorwise Consumption'),
-                      _buildMenuItem('Gas Quality'),
-                      _buildMenuItem('Line Pack'),
-                      _buildMenuItem('RLNG Mixing'),
-                      _buildMenuItem('Log Out'),
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                AnimatedContainer(
+                  color: Color(0xff282824),
+                  duration: Duration(milliseconds: 300),
+                  height: isDrawerOpen.value ? 350 : 0,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _buildMenuItem('Compressor Station'),
+                        _buildMenuItem('Gas Injection'),
+                        _buildMenuItem('GPU'),
+                        _buildMenuItem('End Point Pressure'),
+                        _buildMenuItem('Sectorwise Consumption'),
+                        _buildMenuItem('Gas Quality'),
+                        _buildMenuItem('Line Pack'),
+                        _buildMenuItem('RLNG Mixing'),
+                        _buildMenuItem('Log Out'),
+                      ],
+                    ),
+                  ),
+                ),
+            
+                Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      color: Color(0xffCCCCCC),
+                      child: Text(
+                        "Last sync on : ${homeController.syncDate}",
+                        style: TextStyle(
+                          color: Color(0xff8c1818),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                ),
+                selectedTitle.value == 'Compressor Station'
+                    ? PreferredSize(
+                      preferredSize: Size.fromHeight(35),
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 15),
+                        child: TabBar(
+                          controller: tabController,
+                          isScrollable: false,
+                          labelPadding: EdgeInsets.zero,
+                          unselectedLabelStyle: TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+                          labelColor: Color(0xff8c1818),
+                          unselectedLabelColor: Colors.black,
+                          indicatorColor: Color(0xff8c1818),
+                          indicatorWeight: 2.0,
+                          dividerColor: Colors.transparent,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          tabs: List.generate(2, (index) {
+                            return Tab(
+                              child: Container(
+                                alignment: Alignment.center,
+                                height: 40,
+                                color:
+                                    tabController!.index == index
+                                        ? Color(0xfff0f0f0)
+                                        : Color(0xffa4a0a0),
+                                child: Text(index == 0 ? 'DVPL-VDPL' : 'HVJ'),
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    )
+                    : SizedBox.shrink(),
+            
+                // ////////////////////// CSCP ///////////////////////////////
+                selectedTitle.value == 'Sectorwise Consumption'
+                    ? Column(
+                      children: [
+                        ///////////////////////////////// CGD ////////////////////////////////////
+                        Homeboxwidget(
+                          onTapCall: () {
+                            selectedSectorType.value = "CGD";
+                            showGraph.value = false;
+                          },
+                          txtTitle: "CGD".toUpperCase(),
+                          isSelected: selectedSectorType.value == "CGD",
+                        ),
+            
+                        // /////////////////////////////// Fertiliser ////////////////////////////////////
+                        Homeboxwidget(
+                          onTapCall: () {
+                            selectedSectorType.value = "Fertiliser";
+                            showGraph.value = false;
+                          },
+                          txtTitle: "Fertiliser",
+                          isSelected: selectedSectorType.value == "Fertiliser",
+                        ),
+            
+                        // /////////////////////////////// Power ////////////////////////////////////
+                        Homeboxwidget(
+                          onTapCall: () {
+                            selectedSectorType.value = "Power";
+                            showGraph.value = false;
+                          },
+                          txtTitle: "Power",
+                          isSelected: selectedSectorType.value == "Power",
+                        ),
+                      ],
+                    )
+                    : SizedBox.shrink(),
+            
+                // selectedTitle.value != 'Compressor Station' &&
+                //         selectedTitle.value != 'Sectorwise Consumption'
+                //     ? Homeboxwidget(
+                //       onTapCall: () {
+                //         showGraph.value = false;
+                //       },
+                //       txtTitle: "Trunk".toUpperCase(),
+                //       isSelected: true,
+                //     )
+                //     : SizedBox.shrink(), 
+                    
+         selectedTitle.value != 'Compressor Station' &&
+                        selectedTitle.value != 'Sectorwise Consumption'
+            ? ValueListenableBuilder<String>(
+            valueListenable: selectedTitle,
+            builder:
+                (context, value, _) {
+                  return Homeboxwidget(
+                      onTapCall: () {
+                        showGraph.value = false;
+                      },
+                      txtTitle: value == 'Gas Injection'  ? "Trunk".toUpperCase() : value.toUpperCase(),
+                      isSelected: true,
+                    );
+                        
+                }
+                  
+          ): SizedBox.shrink(), 
+                !showGraph.value
+                    ? Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                      color: Color(0xffCCCCCC),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.circle, size: 10, color: Color(0xff8c1818)),
+                          SizedBox(width: 5),
+                          Text(
+                            "Table View",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    )
+                    : SizedBox.shrink(),
+                showGraph.value
+                    ? ListView.builder(
+                      itemCount: dataKeys.length,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final key = dataKeys[index];
+                        log("key  graph **** $key");
+                        return Container(
+                          height: 360,
+                          margin: EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 16,
+                          ),
+                          child: GasInjectionGraph(
+                            graphRespModel:
+                                homeController.getGraphRespModel ?? [],
+                            dataKey: key,
+                            areaColor:
+                                index % 2 == 0
+                                    ? Color(0xffC6735F)
+                                    : Color(0xff5A4B73),
+                          ),
+                        );
+                      },
+                    )
+                    : Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 20,
+                      ),
+                      child: GasTableData(
+                        getGasData:
+                            (homeController
+                                        .getGasDataRespModel
+                                        ?.isNotEmpty ??
+                                    false)
+                                ? (homeController.getGasDataRespModel ?? [])
+                                    .map((g) => g.toJson())
+                                    .toList()
+                                : [],
+                        gasTableData:
+                            filteredDataList
+                                .map((e) => e.toJson())
+                                .toList(),
+                        type: mapTitleToType(selectedTitle.value),
+                        onRowSelected: (item) async {
+                          if (selectedTitle.value != 'Compressor Station') {
+                            homeController.name.value = item['name'];
+                            homeController.region.value = item['Region'];
+                            homeController.type.value = item['Type'];
+                            
+                            await homeController.getGraphApi();
+                            // setState(() {
+                            homeController.getGraphRespModel;
+                            showGraph.value = true;
+                            // });
+                          }
+                        },
+                      ),
+                    ),
+                SizedBox(height: 10),
+                Text.rich(
+                  TextSpan(
+                    text: 'Red Colour ',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    children: <InlineSpan>[
+                      TextSpan(text: ': Suspicious Data', style: txtStyleWhite),
                     ],
                   ),
                 ),
-              ),
-
-              Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    color: Color(0xffCCCCCC),
-                    child: Text(
-                      "Last sync on : ${homeController.syncDate}",
-                      style: TextStyle(
-                        color: Color(0xff8c1818),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
+               selectedTitle.value == 'Line Pack'
+               ? Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 12,
                   ),
-                  SizedBox(height: 10),
-                ],
-              ),
-              selectedTitle.value == 'Compressor Station'
-                  ? PreferredSize(
-                    preferredSize: Size.fromHeight(35),
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 15),
-                      child: TabBar(
-                        controller: tabController,
-                        isScrollable: false,
-                        labelPadding: EdgeInsets.zero,
-                        unselectedLabelStyle: TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
-                        labelStyle: TextStyle(fontWeight: FontWeight.w500),
-                        labelColor: Color(0xff8c1818),
-                        unselectedLabelColor: Colors.black,
-                        indicatorColor: Color(0xff8c1818),
-                        indicatorWeight: 2.0,
-                        dividerColor: Colors.transparent,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        tabs: List.generate(2, (index) {
-                          return Tab(
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 40,
-                              color:
-                                  tabController!.index == index
-                                      ? Color(0xfff0f0f0)
-                                      : Color(0xffa4a0a0),
-                              child: Text(index == 0 ? 'DVPL-VDPL' : 'HVJ'),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  )
-                  : SizedBox.shrink(),
-
-              // ////////////////////// CSCP ///////////////////////////////
-              selectedTitle.value == 'Sectorwise Consumption'
-                  ? Column(
-                    children: [
-                      ///////////////////////////////// CGD ////////////////////////////////////
-                      Homeboxwidget(
-                        onTapCall: () {
-                          selectedSectorType.value = "CGD";
-                          showGraph.value = false;
-                        },
-                        txtTitle: "CGD".toUpperCase(),
-                      ),
-
-                      // /////////////////////////////// Fertiliser ////////////////////////////////////
-                      Homeboxwidget(
-                        onTapCall: () {
-                          selectedSectorType.value = "Fertiliser";
-                          showGraph.value = false;
-                        },
-                        txtTitle: "Fertiliser",
-                      ),
-
-                      // /////////////////////////////// Power ////////////////////////////////////
-                      Homeboxwidget(
-                        onTapCall: () {
-                          selectedSectorType.value = "Power";
-                          showGraph.value = false;
-                        },
-                        txtTitle: "Power",
-                      ),
-                    ],
-                  )
-                  : SizedBox.shrink(),
-
-              selectedTitle.value != 'Compressor Station' &&
-                      selectedTitle.value != 'Sectorwise Consumption'
-                  ? Homeboxwidget(
-                    onTapCall: () {
-                      showGraph.value = false;
-                    },
-                    txtTitle: "Trunk".toUpperCase(),
-                  )
-                  : SizedBox.shrink(),
-
-              !showGraph.value
-                  ? Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-                    color: Color(0xffCCCCCC),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.circle, size: 10, color: Color(0xff8c1818)),
-                        SizedBox(width: 5),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
                         Text(
-                          "Table View",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          'Notes:',
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'a. "HVJ +" includes HVJ, GREP, CGPL, VKPL-1,2',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'b. "Regional" includes KGB, CB, Guj, Mumbai, Agartala, KKBMPL',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          'c. "Others" includes KMKRPL, CJPL, SNLP, GGS4, Auraiya PL',
+                          style: TextStyle(color: Colors.white),
                         ),
                       ],
                     ),
-                  )
-                  : SizedBox.shrink(),
-              Expanded(
-                child:
-                    showGraph.value
-                        ? ListView.builder(
-                          itemCount: dataKeys.length,
-                          shrinkWrap: true,
-                          physics: AlwaysScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            final key = dataKeys[index];
-                            log("key  graph **** $key");
-                            return Container(
-                              height: 360,
-                              margin: EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 16,
-                              ),
-                              child: GasInjectionGraph(
-                                graphRespModel:
-                                    homeController.getGraphRespModel ?? [],
-                                dataKey: key,
-                                areaColor:
-                                    index % 2 == 0
-                                        ? Color(0xffC6735F)
-                                        : Color(0xff5A4B73),
-                              ),
-                            );
-                          },
-                        )
-                        : Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 20,
-                          ),
-                          child: GasTableData(
-                            getGasData:
-                                (homeController
-                                            .getGasDataRespModel
-                                            ?.isNotEmpty ??
-                                        false)
-                                    ? (homeController.getGasDataRespModel ?? [])
-                                        .map((g) => g.toJson())
-                                        .toList()
-                                    : [],
-                            gasTableData:
-                                filteredDataList
-                                    .map((e) => e.toJson())
-                                    .toList(),
-                            type: mapTitleToType(selectedTitle.value),
-                            onRowSelected: (item) async {
-                              if (selectedTitle.value != 'Compressor Station') {
-                                homeController.name.value = item['name'];
-                                homeController.region.value = item['Region'];
-                                homeController.type.value = item['Type'];
-
-                                await homeController.getGraphApi();
-                                // setState(() {
-                                homeController.getGraphRespModel;
-                                showGraph.value = true;
-                                // });
-                              }
-                            },
-                          ),
-                        ),
-              ),
-              SizedBox(height: 10),
-                Text.rich(
-            TextSpan(
-              text: 'Red Colour ',style: TextStyle(color: Colors.red,fontWeight: FontWeight.w600),
-              children: <InlineSpan>[
-                TextSpan(
-                  text: ': Suspicious Data',
-                  style: txtStyleWhite,
+                  ),
                 )
-              ]
-            )
-          ),
-
-              SizedBox(height: 15),
-            ],
+                : SizedBox.shrink(),
+              ],
+            ),
           );
         }),
       ),

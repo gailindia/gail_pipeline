@@ -50,8 +50,10 @@ class HomeController extends GetxController{
 
   ///////////************* graph data  ****//////////////////////////////
   Future<void> getGraphApi() async{
+    CommonLoader.showLoading();
     getGraphRespModel.value =  await apiService.getGraphDataRepo(type: type.value.trim(),region:region.value.trim(),name: name.value.trim()) ?? [];
-    log("getGraphRespModel controller ${getGraphRespModel?.length}");
+    log("getGraphRespModel controller ${getGraphRespModel.length}");
+    CommonLoader.hideLoading();
     // getGraphRespModel =  await apiService.getGraphDataRepo(type.value.toUpperCase(),region.value.toUpperCase(),name.value.toUpperCase());
-  }
+  } 
 }

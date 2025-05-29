@@ -86,7 +86,6 @@ class _GasTableDataState extends State<GasTableData> {
         log(
           "filteredRows ()))))&&&&&& ${filteredGasTable.length} ()() $filteredGasTable",
         );
-
         for (var gasStnItem in widget.gasTableData) {
           for (var gasItem in filteredGasTable) {
             final sameName = gasStnItem['name'] == gasItem['NAME'];
@@ -150,7 +149,7 @@ class _GasTableDataState extends State<GasTableData> {
             scrollDirection: Axis.horizontal,
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: constraints.maxWidth),
-              child: DataTableTheme(
+              child: DataTableTheme( 
                 data: DataTableThemeData(
                   headingRowColor: WidgetStateProperty.all(Color(0xff4c7c80)),
                   dataRowColor: WidgetStateProperty.all(Colors.black),
@@ -158,8 +157,8 @@ class _GasTableDataState extends State<GasTableData> {
                 ),
                 child: DataTable(
                   showCheckboxColumn: false,
-                  columnSpacing: 1.0,
-                  columns: columns,
+                  columnSpacing: 20,
+                  columns: columns, 
                   rows:
                       filteredRows.map((item) {
                         return DataRow(
@@ -241,13 +240,30 @@ class _GasDataSource extends DataTableSource {
           orElse: () => MatchedList("", "", -1),
         );
         final isMatchedCell = match.matchclmnIndx != -1;
-        log("getrows  $isMatchedCell ");
 
-        log("getrows **** ${matchedItemList.length} ");
+        // log("getrows **** ${matchedItemList.length} ");
+        ///////////////////////////////////////////////////////////
 
+        // log("formattedValue $isNameField *** $formattedValue ");
+
+        String formattedValue = value?.toString() ?? '';
+        if (isNameField &&
+            formattedValue.length > 8 &&
+            (formattedValue.contains(' ') || formattedValue.contains('-'))) {
+          int breakIndex =
+              formattedValue.contains(' ')
+                  ? formattedValue.indexOf(' ')
+                  : formattedValue.indexOf('-');
+
+          if (breakIndex != -1) {
+            formattedValue =
+                '${formattedValue.substring(0, breakIndex)}\n${formattedValue.substring(breakIndex + 1)}';
+          }
+        }
         return DataCell(
           Text(
-            value?.toString() ?? '',
+            // value?.toString() ?? '',
+            formattedValue,
             style:
                 isNameField
                     ? (type == "COMP")
@@ -256,9 +272,12 @@ class _GasDataSource extends DataTableSource {
                     : isMatchedCell
                     ? TextStyle(color: Colors.red, fontWeight: FontWeight.bold)
                     : txtStylegreen,
-            textScaler: TextScaler.linear(0.9),
+            maxLines: isNameField ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
+            softWrap: true, 
+            textScaler: TextScaler.linear(1.0),
           ),
-        );
+        ); 
       }).toList();
     } else {
       return item.values.map((value) {
@@ -277,6 +296,7 @@ class _GasDataSource extends DataTableSource {
             fields[index],
             style: txtStyleYellow,
             textScaler: TextScaler.linear(1.0),
+            textAlign: TextAlign.center,
           ),
           onSort:
               (columnIndex, ascending) =>

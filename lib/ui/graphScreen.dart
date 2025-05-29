@@ -48,7 +48,7 @@ class _GasInjectionGraphState extends State<GasInjectionGraph> {
     // log("graphData build dataKey ${jsonEncode(graphData)}");
 
     if (graphData.isEmpty) {
-      return Center(child: Text('No data available'));
+      return Center(child: Text('No data available',style: txtStyleWhiteB,));
     }
 
     double minValue = graphData
@@ -110,10 +110,10 @@ class _GasInjectionGraphState extends State<GasInjectionGraph> {
             enable: true,
             activationMode: ActivationMode.singleTap,
             tooltipDisplayMode: TrackballDisplayMode.groupAllPoints,
-            lineColor: Colors.transparent,
+            lineColor: Colors.transparent,hideDelay: 2000
           ),
           series: <CartesianSeries<GraphRespModel, String>>[
-            AreaSeries<GraphRespModel, String>(
+            SplineAreaSeries<GraphRespModel, String>(
               dataSource: widget.graphRespModel,
               xValueMapper: (GraphRespModel data, _) {
                 return data.timeStamp.toString();

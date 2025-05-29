@@ -11,11 +11,6 @@ import 'package:gail_pipeline/widgets/logowidget.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart'; 
 
-
- 
- 
-
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key,});
 
