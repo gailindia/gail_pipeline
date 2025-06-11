@@ -1,17 +1,14 @@
- 
-
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'package:gail_pipeline/constants/app_constants.dart';
 import 'package:gail_pipeline/controller/login_controller.dart';
-import 'package:gail_pipeline/utils/secure_storage.dart'; 
+import 'package:gail_pipeline/utils/secure_storage.dart';
+import 'package:gail_pipeline/widgets/dialog.dart';
 import 'package:gail_pipeline/widgets/styles/mytextStyle.dart';
 
 import 'package:get/get.dart';
-
- 
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,12 +18,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  LoginController loginController = Get.put(LoginController()); 
+  LoginController loginController = Get.put(LoginController());
   final _formKey = GlobalKey<FormState>();
 
   bool numbervisible = true;
   bool otpvisible = false;
   int secondsRemaining = 45;
+  
   bool enableResend = false;
   Timer? timer;
   String? otp = "", roletype = '';
@@ -39,21 +37,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    fetchSecureStorageData();  
+    fetchSecureStorageData();
     super.initState();
   }
-  
-Future<void> fetchSecureStorageData() async {
-loginController.userIDController.text = await LocalStorage.getUserName() ?? "";
-loginController.passwordController.text = await LocalStorage.getPassWord() ?? "";
- if (loginController.userIDController.text.isNotEmpty && loginController.passwordController.text.isNotEmpty) { 
-      loginController.loginUser(); 
-    } 
-}
+
+  Future<void> fetchSecureStorageData() async {
+    loginController.userIDController.text =
+        await LocalStorage.getUserName() ?? "";
+    loginController.passwordController.text =
+        await LocalStorage.getPassWord() ?? "";
+    if (loginController.userIDController.text.isNotEmpty &&
+        loginController.passwordController.text.isNotEmpty) {
+      loginController.loginUser();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // fetchSecureStorageData(); 
     return SafeArea(
       child: Container(
         decoration: BoxDecoration(
@@ -65,7 +65,7 @@ loginController.passwordController.text = await LocalStorage.getPassWord() ?? ""
             child: Form(
               key: _formKey,
               child: Column(
-                children: [ 
+                children: [
                   Padding(
                     padding: EdgeInsets.only(top: 50.0, bottom: 50),
                     child: Image.asset(
@@ -85,97 +85,97 @@ loginController.passwordController.text = await LocalStorage.getPassWord() ?? ""
                     ),
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: 40,
-                          child: TextFormField(
-                            minLines: 1,
-                            autocorrect: false,
-                            keyboardType: TextInputType.multiline,
-                            controller: loginController.userIDController,
-                            textCapitalization: TextCapitalization.sentences,
-                            maxLength: 30,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'User Id is empty';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              fillColor: Colors.white,
-                              filled: true,
-                              counterText: '',
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                  width: 2.0,
-                                ),
+                        TextFormField(
+                          minLines: 1,
+                          autocorrect: false,
+                          keyboardType: TextInputType.multiline,
+                          controller: loginController.userIDController,
+                          textCapitalization: TextCapitalization.sentences,
+                          maxLength: 30,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Username is empty';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            fillColor: Colors.white,
+                            filled: true,
+                            counterText: '',
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(
+                                color: Colors.red,
+                                width: 2.0,
                               ),
-                              hintText: "Username",
-                              hintStyle: txtStylegrey,
-                              // prefixIcon: Icon(Icons.person_outline_rounded),
-                              contentPadding: const EdgeInsets.all(12),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  width: 1,
-                                  color: Colors.indigo,
-                                ),
-                                borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            hintText: "Username",
+                            hintStyle: txtStylegrey,
+                            // prefixIcon: Icon(Icons.person_outline_rounded),
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 12,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                width: 1,
+                                color: Colors.indigo,
                               ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  width: 2,
-                                  color: Colors.indigo,
-                                ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: Colors.indigo,
                               ),
                             ),
                           ),
                         ),
                         SizedBox(height: 15),
-                        SizedBox(
-                          height: 40,
-                          child: TextFormField(
-                            minLines: 1,
-                            autocorrect: false,
-                            obscureText: true,
-                            keyboardType: TextInputType.multiline,
-                            controller: loginController.passwordController,
-                            textCapitalization: TextCapitalization.sentences,
-                            maxLength: 20,
-                            // maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Password is empty';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              fillColor: Colors.white,
-                              filled: true,
-                              counterText: '',
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                  width: 2.0,
-                                ),
+                        TextFormField(
+                          minLines: 1,
+                          autocorrect: false,
+                          obscureText: true,
+                          keyboardType: TextInputType.multiline,
+                          controller: loginController.passwordController,
+                          textCapitalization: TextCapitalization.sentences,
+                          maxLength: 20,
+                          // maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Password is empty';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            fillColor: Colors.white,
+                            filled: true,
+                            counterText: '',
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(
+                                color: Colors.red,
+                                width: 2.0,
                               ),
-                              hintText: "Password",
-                              hintStyle: txtStylegrey,
-                              //  prefixIcon: Icon(Icons.person_outline_rounded),
-                              contentPadding: const EdgeInsets.all(12),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  width: 1,
-                                  color: Colors.indigo,
-                                ),
-                                borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            hintText: "Password",
+                            hintStyle: txtStylegrey,
+                            //  prefixIcon: Icon(Icons.person_outline_rounded),
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 12,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                width: 1,
+                                color: Colors.indigo,
                               ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  width: 2,
-                                  color: Colors.indigo,
-                                ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: Colors.indigo,
                               ),
                             ),
                           ),
@@ -183,13 +183,34 @@ loginController.passwordController.text = await LocalStorage.getPassWord() ?? ""
 
                         SizedBox(height: 25),
                         InkWell(
-                          onTap: () { 
+                          onTap: () {
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
                               log("call login");
 
                               loginController.loginUser();
                             }
+                            // final userId =
+                            //     loginController.userIDController.text.trim();
+                            // final password =
+                            //     loginController.passwordController.text.trim();
+
+                            // if (userId.isEmpty) {
+                            //   showToastMessage(
+                            //     title: "Error",
+                            //     message: "User Id is empty",
+                            //   );
+                            //   return;
+                            // }
+                            // if (password.isEmpty) {
+                            //   showToastMessage(
+                            //     title: "Error",
+                            //     message: "Password is empty",
+                            //   );
+                            //   return;
+                            // }
+                            // log("call login");
+                            // loginController.loginUser();
                           },
 
                           child: Container(
