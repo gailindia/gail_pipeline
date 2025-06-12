@@ -13,10 +13,11 @@ import 'package:gail_pipeline/model/login_respModel.dart';
 import 'package:gail_pipeline/utils/secure_storage.dart';
 
 import 'package:get/get.dart';
-import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
+import '../widgets/dialog.dart';
 
 
-late ProgressDialog pr;
 class APIService extends GetConnect {
   //   ///////////////********************* send error logs ****************///////////////////////
   //   sendErrorLogs({
@@ -70,6 +71,7 @@ class APIService extends GetConnect {
 
       final loginModel = LoginResModel.fromJson(firstItem);
       LocalStorage.setToken(loginModel.token.toString());
+      LocalStorage.setAppVersion(loginModel.apkVersion.toString(), loginModel.iPAVERSION.toString());
       log("LoginResModel ${loginModel.token.toString()}");
 
       return loginModel;
@@ -214,4 +216,7 @@ class APIService extends GetConnect {
       return null;
     }
   }
+
+
+
 }

@@ -22,7 +22,7 @@ class _HomescreenState extends State<Homescreen>
     with SingleTickerProviderStateMixin {
   HomeController homeController = Get.find<HomeController>();
   // RxString selectedTitle = "Line Pack".obs;
-  ValueNotifier<String> selectedTitle = ValueNotifier("Line Pack");
+  ValueNotifier<String> selectedTitle = ValueNotifier("Compressor Station");
   RxString selectedSubType = 'DVPL-VDPL'.obs;
   RxString selectedSectorType = 'CGD'.obs;
   RxBool isDrawerOpen = false.obs;
