@@ -26,7 +26,7 @@ class _HomescreenState extends State<Homescreen>
   RxString selectedSubType = 'DVPL-VDPL'.obs;
   RxString selectedSectorType = 'CGD'.obs;
   RxBool isDrawerOpen = false.obs;
-  int selectedIndex = 0;
+  int selectedIndex = 0; 
   TabController? tabController;
   RxBool showGraph = false.obs;
 
@@ -431,11 +431,13 @@ class _HomescreenState extends State<Homescreen>
                           'c. "Others" includes KMKRPL, CJPL, SNLP, GGS4, Auraiya PL',
                           style: TextStyle(color: Colors.white),
                         ),
+                         SizedBox(height: 10),
                       ],
                     ),
                   ),
                 )
                 : SizedBox.shrink(),
+               
               ],
             ),
           );

@@ -39,5 +39,5 @@ class DialogUtils {
   }
 }
 showToastMessage({required String title, required String message}) {
-  Get.snackbar(title, message, duration: const Duration(seconds: 20),colorText: Color(0xffFF001A));
+  Get.snackbar(title, message, duration: const Duration(seconds: 3),colorText: Color(0xffFF001A));
 }

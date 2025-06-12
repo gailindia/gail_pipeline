@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+ 
 import 'package:flutter/material.dart';
 import 'package:gail_pipeline/ui/mapType.dart';
 import 'package:gail_pipeline/widgets/styles/mytextStyle.dart';
@@ -77,15 +76,11 @@ class _GasTableDataState extends State<GasTableData> {
           final aValue = a[key]?.toString().toLowerCase() ?? '';
           final bValue = b[key]?.toString().toLowerCase() ?? '';
 
-          return sortAscending
+           return sortAscending
               ? aValue.compareTo(bValue)
               : bValue.compareTo(aValue);
         });
-        ////////////////////////////////////////
-        log("filteredRows ())))) ${filteredRows.length} ()()");
-        log(
-          "filteredRows ()))))&&&&&& ${filteredGasTable.length} ()() $filteredGasTable",
-        );
+       
         for (var gasStnItem in widget.gasTableData) {
           for (var gasItem in filteredGasTable) {
             final sameName = gasStnItem['name'] == gasItem['NAME'];
@@ -113,9 +108,7 @@ class _GasTableDataState extends State<GasTableData> {
                 if (columnIndex != -1 && columnIndex < headers.length) {
                   final header = headers[columnIndex];
 
-                  log(
-                    " Matched param: $parameter → key: $paramKey → column: $columnIndex → header: $header row $gasItem gggg $gasStnItem",
-                  );
+                  
                   matchedItems.add(
                     MatchedList(
                       header,
@@ -123,18 +116,18 @@ class _GasTableDataState extends State<GasTableData> {
                       columnIndex,
                     ),
                   );
-                  log("matched itmes $matchedItems");
+                  // log("matched itmes $matchedItems");
 
-                  log(
-                    "msg type $type matched param: $parameter &&&&& ${gasItem['NAME']} ***** ${gasStnItem['name']} ***** $header",
-                  );
+                  // log(
+                  //   "msg type $type matched param: $parameter &&&&& ${gasItem['NAME']} ***** ${gasStnItem['name']} ***** $header",
+                  // );
                 } else {
-                  log("paramKey '$paramKey' not found in rowKeys: $rowKeys");
+                  // print("paramKey '$paramKey' not found in rowKeys: $rowKeys");
                 }
               } else {
-                log(
-                  " Missing paramKey or rowMap/headerMap for type ${widget.type}",
-                );
+                // print(
+                //   " Missing paramKey or rowMap/headerMap for type ${widget.type}",
+                // );
               }
             }
           }
@@ -241,11 +234,6 @@ class _GasDataSource extends DataTableSource {
         );
         final isMatchedCell = match.matchclmnIndx != -1;
 
-        // log("getrows **** ${matchedItemList.length} ");
-        ///////////////////////////////////////////////////////////
-
-        // log("formattedValue $isNameField *** $formattedValue ");
-
         String formattedValue = value?.toString() ?? '';
         if (isNameField &&
             formattedValue.length > 8 &&
@@ -261,8 +249,7 @@ class _GasDataSource extends DataTableSource {
           }
         }
         return DataCell(
-          Text(
-            // value?.toString() ?? '',
+          Text( 
             formattedValue,
             style:
                 isNameField
